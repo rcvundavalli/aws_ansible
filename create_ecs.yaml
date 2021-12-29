@@ -11,7 +11,7 @@
       name: gpg
       state: present
   - name: This command will change the working directory to somedir/
-    ansible.builtin.shell:
+    shell:
      cmd: gpg --import gpg.pk
   - name: "Install ECS CLI"
     get_url:
