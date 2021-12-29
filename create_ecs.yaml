@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+  - name: Download file with check (sha256)
+    get_url:
+     url: https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
+     dest: /usr/local/bin/ecs-cli
+  - name: Install gpg module
+    yum:
+      name: gpg
+      state: present
+  - name: This command will change the working directory to somedir/
+    ansible.builtin.shell:
+     cmd: gpg --import gpg.pk
+  - name: "Install ECS CLI"
+    get_url:
+      url: https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest.asc
+      dest: "./ecs-cli.asc"
+  - name: "gpg --verify ecs-cli.asc /usr/local/bin/ecs-cli"
+    shell:
+      "gpg --verify ecs-cli.asc /usr/local/bin/ecs-cli"
+    register: gpgout
+  - debug: msg="{{gpgout.stdout_lines}}"
+  - name: "add permissions to ecs-cli"
+    shell: |
+       chmod +x /usr/local/bin/ecs-cli
+       #sudo ecs-cli --version
+  - name: "ecs-cli configure"
+    command:
+      cmd: |
+        /usr/local/bin/ecs-cli configure --cluster ec2-tutorial --region us-east-1 --default-launch-type EC2 --config-name ec2-tutorial
+  - name: "ecs-cli configure"
+    command:
+      cmd: |
+       /usr/local/bin/ecs-cli configure profile --access-key {{ AWS_ACCESS_KEY_ID }} --secret-key {{ AWS_SECRET_ACCESS_KEY }} --profile-name ec2-tutorial-profile
+  - name: "ecs-cli cluster install"
+    command:
+      cmd: |
+       /usr/local/bin/ecs-cli up --keypair rajani --capability-iam --size 2 --instance-type t2.micro --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
+
