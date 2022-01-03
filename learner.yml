@@ -1,0 +1,41 @@
+---
+ - hosts: localhost
+   tasks:
+     - name: Download amazon ECS cli binary
+       command: sudo curl -Lo /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
+
+     - name: Download and insatall gpg
+       command: sudo yum install gpg
+
+     - name: Download the Amazon ECS CLI signatures
+       command: sudo curl -Lo ecs-cli.asc https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest.asc
+
+     - name: Verify the signature
+       command: gpg --verify ecs-cli.asc /usr/local/bin/ecs-cli
+
+     - name: Apply execute permissions to the binary
+       command: sudo chmod +x /usr/local/bin/ecs-cli
+
+     - name: Verify that the CLI is working properly
+       command: ecs-cli --version
+
+     - name: Create a cluster configuration
+       command: ecs-cli configure --cluster ec2-tutorial --default-launch-type EC2 --config-name ec2-tutorial --region us-east-1
+
+     - name: Create a profile using your access key and secret key
+       command: ecs-cli configure profile --access-key AKIAUMVQDXJGRXO6SFU6 --secret-key hA1y9X3fBR+dibiXFWVE4NMaD9t/VUlUT2oJtO2z --profile-name ec2-tutorial-profile
+       
+     - name: Create Your Cluster
+       command: ecs-cli up --keypair rajani --capability-iam --size 2 --instance-type t2.micro --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
+
+     - name: Deploy the Compose File to a Cluster
+       command: ecs-cli compose up --create-log-groups --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
+      
+     - name: View the Running Containers on a Cluster
+       command: ecs-cli ps --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
+        
+     - name: Scale the Tasks on a Cluster
+       command: ecs-cli compose scale 2 --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
+     
+         #- name: Create an ECS Service from a Compose File
+         #command: ecs-cli compose down --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profileD
