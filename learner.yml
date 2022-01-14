@@ -23,7 +23,7 @@
        command: ecs-cli configure --cluster ec2-tutorial --default-launch-type EC2 --config-name ec2-tutorial --region us-east-1
 
      - name: Create a profile using your access key and secret key
-       command: ecs-cli configure profile --access-key AKIAUMVQDXJGRXO6SFU6 --secret-key hA1y9X3fBR+dibiXFWVE4NMaD9t/VUlUT2oJtO2z --profile-name ec2-tutorial-profile
+       command: ecs-cli configure profile --access-key XXXXXXXXXXXXXXXXXXXXXXXXXXXXX --secret-key XXXXXXXXXXXXXXXXXXXXXXXXXXX --profile-name ec2-tutorial-profile
        
      - name: Create Your Cluster
        command: ecs-cli up --keypair rajani --capability-iam --size 2 --instance-type t2.micro --cluster-config ec2-tutorial --ecs-profile ec2-tutorial-profile
